@@ -8,13 +8,15 @@ const listingSchema = new Schema({
     },
     description: String,
     image: {
+        filename: {
         type: String,
-        default: //if img undefined/null/doesn't exists -> for testing purposes backend
-            "https://images.exoticestates.com/files/presets/pg_xl/property/1409/gallery/luxury_maui_beachfront_villa_vacation_rental_01.jpghttps://images.exoticestates.com/files/presets/pg_xl/property/1409/gallery/luxury_maui_beachfront_villa_vacation_rental_01.jpg",
-        set: (v) => //img is avaialable but its link is -> empty or non-empty  ->for client side
-          v === "" 
-            ? "https://images.exoticestates.com/files/presets/pg_xl/property/1409/gallery/luxury_maui_beachfront_villa_vacation_rental_01.jpg" 
-            : v
+        default: "listingimage"
+        },
+        url: {
+        type: String,
+        default:
+            "https://images.exoticestates.com/files/presets/pg_xl/property/1409/gallery/luxury_maui_beachfront_villa_vacation_rental_01.jpg"
+        }
     },
     price: Number,
     location: String,
