@@ -3,6 +3,8 @@ const app = express();
 const mongoose = require("mongoose");
 const Listing = require("./models/listing.js");
 const path = require("path"); //ejs setup
+const methodOverride = require("method-override"); //method-override
+const ejsMate = require("ejs-mate"); //ejs mate required 
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 
@@ -21,6 +23,9 @@ async function main() {
 app.set("view engine", "ejs"); //ejs setup
 app.set("views", path.join(__dirname, "views"));//ejs setup
 app.use(express.urlencoded({extended: true}));
+app.use(methodOverride("_method"));//method-override
+app.engine('ejs', ejsMate); //works like includes/partials in EJS
+app.use(express.static(path.join(__dirname, "/public"))); //to use static files
 
 app.get("/", (req, res) => {
     res.send("Hi i am root");
@@ -53,6 +58,29 @@ app.post("/listings", async(req, res) => {
     await newListing.save();
     res.redirect("/listings");
     console.log(listing);
+});
+
+//Edit route
+app.get("/listings/:id/edit", async(req, res) => {
+    //id ka use krke us listing ko acquire kr lenge
+    let { id } = req.params;
+    const listing = await Listing.findById(id);
+    res.render("listings/edit.ejs", { listing });
+})
+
+//Update route
+app.put("/listings/:id", async(req, res) => {
+    let { id } = req.params;
+    await Listing.findByIdAndUpdate(id, {...req.body.listing});
+    res.redirect(`/listings/${id}`);
+});
+
+//DELETE route
+app.delete("/listings/:id", async(req, res) => {
+    let { id } = req.params;
+    let deletedListing = await Listing.findByIdAndDelete(id);
+    console.log(deletedListing);
+    res.redirect("/listings");
 });
 
 
