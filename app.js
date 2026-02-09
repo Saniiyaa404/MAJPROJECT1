@@ -24,7 +24,7 @@ app.set("view engine", "ejs"); //ejs setup
 app.set("views", path.join(__dirname, "views"));//ejs setup
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));//method-override
-app.engine('ejs', ejsMate); //works like includes/partials in EJS
+app.engine('ejs', ejsMate); //works like includes/partials in EJS(mate)
 app.use(express.static(path.join(__dirname, "/public"))); //to use static files
 
 app.get("/", (req, res) => {
