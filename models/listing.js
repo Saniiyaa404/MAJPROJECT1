@@ -18,7 +18,12 @@ const listingSchema = new Schema({
             "https://images.exoticestates.com/files/presets/pg_xl/property/1409/gallery/luxury_maui_beachfront_villa_vacation_rental_01.jpg"
         }
     },
-    price: Number,
+    price: {
+    type: Number,
+    required: true,
+    min: 0,
+    default: 0
+    },
     location: String,
     country: String
 });
