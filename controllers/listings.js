@@ -1,4 +1,6 @@
 const Listing =  require("../models/listing");
+const fetch = (...args) =>
+  import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 module.exports.index = async (req, res) => {
     const allListings = await Listing.find({});
@@ -28,9 +30,39 @@ module.exports.showListing = async(req, res) => {
 };
 
 module.exports.createListing = async (req, res, next) => {
+        let url = req.file.path;
+        let filename = req.file.filename;
         const newListing = new Listing(req.body.listing);
-        console.log(req.user);
         newListing.owner = req.user._id; //newly created listing owner field should have current user's id
+        newListing.image = {url, filename};
+        // newListing.geometry = {
+        //     type: "Point",
+        //     coordinates: [77.2090, 28.6139] // Delhi (for now)
+        // };
+        let location = req.body.listing.location;
+        let response = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&q=${location}`,
+            {
+                headers: {
+                "User-Agent": "wanderlust-app"
+                }
+        });
+        let data = await response.json();
+        if(data.length > 0){
+            let lng = data[0].lon;
+            let lat = data[0].lat;
+
+            newListing.geometry = {
+                type: "Point",
+                coordinates: [lng, lat]
+            };
+        }
+        else{
+            newListing.geometry = {
+                type: "Point",
+                coordinates: [77.2090, 28.6139]
+            };
+        }
 
         await newListing.save();
         req.flash("success", "New Listing Created!"); 
@@ -45,18 +77,25 @@ module.exports.renderEditForm = async(req, res) => {
         req.flash("error", "Listing you requested for, does not exists");
         return res.redirect("/listings");
     }
-    res.render("listings/edit.ejs", { listing });
+
+    let originalImageUrl = listing.image.url;
+    originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250");
+    res.render("listings/edit.ejs", { listing, originalImageUrl });
 };
 
 module.exports.updateListing = async(req, res) => {
     let { id } = req.params;
-    if (!req.body.listing.image.url) {
-    delete req.body.listing.image.url;
-    }
-    await Listing.findByIdAndUpdate(id, req.body.listing, { 
+    let listing = await Listing.findByIdAndUpdate(id, req.body.listing, { 
         runValidators: true,
         new: true
     });
+    if(typeof req.file !== "undefined"){
+        let url = req.file.path;
+        let filename = req.file.filename;
+        listing.image = {url, filename};
+        await listing.save();
+    }
+
     req.flash("success", "Listing updated!");
     res.redirect(`/listings/${id}`);
 };
