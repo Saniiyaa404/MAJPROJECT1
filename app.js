@@ -1,7 +1,6 @@
 if(process.env.NODE_ENV != "production"){
     require('dotenv').config();
 }
-console.log(process.env.SECRET);
 
 const express = require("express");
 const app = express();
@@ -24,9 +23,16 @@ const userRouter = require("./routes/user.js");
 
 const dburl = process.env.ATLASDB_URL;
 
+const PORT = process.env.PORT || 8080;
+
 main()
 .then(() => {
     console.log("Connected to DB");
+
+    app.listen(PORT, () => {
+        console.log(`Server is listening on port ${PORT}`);
+    });
+
 })
 .catch((err) => {
     console.log(err);
@@ -61,16 +67,18 @@ const sessionOptions = {
     resave: false,
     saveUninitialized: true,
     cookie: {
-        expires: Date.now() + 7*24*60*60*1000,
-        maxAge: 7*24*60*60*1000,
-        httpOnly: true
+    expires: Date.now() + 7*24*60*60*1000,
+    maxAge: 7*24*60*60*1000,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production"
     }
 };
 
-// app.get("/", (req, res) => {
-//     res.send("Hi i am root");
-// });
+app.get("/", (req, res) => {
+    res.send("Server working 🚀");
+});
 
+app.set("trust proxy", 1);
 app.use(session(sessionOptions));
 app.use(flash()); 
 //pehle flash aayga uske baad routes aaynge bcoz flash will be used in routes, eg: app.use("/listings/:id/reviews", reviews); 
@@ -130,8 +138,4 @@ app.use((err, req, res, next) => {
     let {statusCode = 500, message = "Something went wrong"} = err;
     res.status(statusCode).render("error.ejs", { message });
     //res.status(statusCode).send(message);
-});
-
-app.listen(8080, ()=>{
-    console.log("server is listening to port 8080");
 });
