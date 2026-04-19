@@ -94,6 +94,7 @@ app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     res.locals.currUser = req.user;
+    res.locals.search = req.query.search || "";
     next();
     //success is an empty array, if success.length > 0 then only show alert
 })

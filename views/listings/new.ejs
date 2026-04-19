@@ -37,6 +37,16 @@
             <input name="listing[location]" placeholder="New Delhi" type="text" class="form-control" required>
             <div class="invalid-feedback">Location should be valid</div>
         </div>
+        <div class="mb-3">
+            <label for="category" class="form-label">Category</label>
+            <select name="listing[category]" class="form-control" required>
+                <option value="">Select Category</option>
+
+                <% categories.forEach(cat => { %>
+                    <option value="<%= cat %>"><%= cat %></option>
+                <% }) %>
+            </select>
+        </div>
 
         <button class="btn btn-dark add-btn mt-3">Add</button>
         

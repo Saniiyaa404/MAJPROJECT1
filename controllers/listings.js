@@ -1,14 +1,38 @@
 const Listing =  require("../models/listing");
 const fetch = (...args) =>
-  import('node-fetch').then(({ default: fetch }) => fetch(...args));
+import('node-fetch').then(({ default: fetch }) => fetch(...args));
+
+const categories = require('../utils/categories');
 
 module.exports.index = async (req, res) => {
-    const allListings = await Listing.find({});
-    res.render("listings/index.ejs", { allListings });
+    let { category, search } = req.query;
+
+    let query={};
+    //search logic
+    if(search){
+        query.$or = [
+            { title: { $regex: search, $options: "i" } },
+            { location: { $regex: search, $options: "i" } },
+            { country: { $regex: search, $options: "i" } }
+        ];
+    }
+
+    //category filter
+    if(category){
+        query.category = category;
+    }
+
+    const allListings = await Listing.find(query);
+
+    res.render("listings/index.ejs", { 
+        allListings, 
+        category,
+        search
+    });
 };
 
 module.exports.renderNewForm = (req, res) => {
-    res.render("listings/new.ejs");
+    res.render("listings/new.ejs", { categories });
 };
 
 module.exports.showListing = async(req, res) => {
@@ -30,6 +54,8 @@ module.exports.showListing = async(req, res) => {
 };
 
 module.exports.createListing = async (req, res, next) => {
+        console.log(req.body.listing);
+        
         let url = req.file.path;
         let filename = req.file.filename;
         const newListing = new Listing(req.body.listing);
@@ -80,7 +106,7 @@ module.exports.renderEditForm = async(req, res) => {
 
     let originalImageUrl = listing.image.url;
     originalImageUrl = originalImageUrl.replace("/upload", "/upload/w_250");
-    res.render("listings/edit.ejs", { listing, originalImageUrl });
+    res.render("listings/edit.ejs", { listing, originalImageUrl, categories });
 };
 
 module.exports.updateListing = async(req, res) => {

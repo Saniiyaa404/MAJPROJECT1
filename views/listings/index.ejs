@@ -24,6 +24,8 @@
             text-align: center;
             /* margin-right: 2rem; */
             opacity: 0.7;
+            text-decoration: none;
+            color: inherit;
         }
 
         .filter:hover {
@@ -33,6 +35,11 @@
 
         .filter p {
             font-size: 0.9rem;
+        }
+
+        .filter.active{
+            opacity: 1;
+            font-weight: bold;
         }
 
         .tax-info {
@@ -51,62 +58,93 @@
             transform: translateY(-5px);
         }
 
+        .overlay{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 998;
+        }
+
+        .overlay.active{
+            display: block;
+        }
     </style>
 
+    <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
     <div id="filters">
+
+        <button class="filter-btn d-md-none" onclick="toggleSidebar()">
+            <i class="fa-solid fa-sliders"></i>
+        </button>
+
         <div class="filters-left">
-            <div class="filter">
+            <a href="/listings" class="filter">
+                <div><i class="fa-solid fa-list"></i></div>
+                <p>All</p>
+            </a>
+            <a href="/listings?category=Trending" class="filter <%= category === 'Trending' ? 'active' : '' %>">
                 <div><i class="fa-solid fa-fire"></i></div>
                 <p>Trending</p>
-            </div>
-            <div class="filter">
+            </a>
+            <a href="/listings?category=Rooms" class="filter <%= category === 'Rooms' ? 'active' : '' %>">
                 <div><i class="fa-solid fa-bed"></i></div>
                 <p>Rooms</p>
-            </div>
-            <div class="filter">
+            </a>
+            <a href="/listings?category=Iconic cities" class="filter <%= category === 'Iconic cities' ? 'active' : '' %>">
                 <div><i class="fa-solid fa-mountain-city"></i></div>
                 <p>Iconic cities</p>
-            </div>
-            <div class="filter">
+            </a>
+            <a href="/listings?category=Mountains" class="filter <%= category === 'Mountains' ? 'active' : '' %>">
                 <div><i class="fa-solid fa-mountain"></i></div>
                 <p>Mountains</p>
-            </div>
-            <div class="filter">
+            </a>
+            <a href="/listings?category=Castles" class="filter <%= category === 'Castles' ? 'active' : '' %>">
                 <div><i class="fa-brands fa-fort-awesome"></i></div>
                 <p>Castles</p>
-            </div>
-            <div class="filter">
+            </a>
+            <a href="/listings?category=Arctic" class="filter <%= category === 'Arctic' ? 'active' : '' %>">
                 <div><i class="fa-regular fa-snowflake"></i></div>
                 <p>Arctic</p>
-            </div>
-            <div class="filter">
+            </a>
+            <a href="/listings?category=Camping" class="filter <%= category === 'Camping' ? 'active' : '' %>">
                 <div><i class="fa-solid fa-campground"></i></div>
                 <p>Camping</p>
-            </div>
-            <div class="filter">
+            </a>
+            <a href="/listings?category=Farms" class="filter <%= category === 'Farms' ? 'active' : '' %>">
                 <div><i class="fa-solid fa-wheat-awn"></i></div>
                 <p>Farms</p>
-            </div>
-            <div class="filter">
+            </a>
+            <a href="/listings?category=Amazing pools" class="filter <%= category === 'Amazing pools' ? 'active' : '' %>">
                 <div><i class="fa-solid fa-person-swimming"></i></div>
                 <p>Amazing pools</p>
-            </div>
-            <div class="filter">
+            </a>
+            <a href="/listings?category=Domes" class="filter <%= category === 'Domes' ? 'active' : '' %>">
                 <div><i class="fa-solid fa-igloo"></i></div>
                 <p>Domes</p>
-            </div>
-            <div class="filter">
+            </a>
+            <a href="/listings?category=Boats" class="filter <%= category === 'Boats' ? 'active' : '' %>">
                 <div><i class="fa-solid fa-ship"></i></div>
                 <p>Boats</p>
-            </div>
+            </a>
         </div>
         <div class="tax-toggle">
             <div class="form-check-reverse form-switch">
             <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
-            <label class="form-check-label" for="switchCheckDefault">Display total after taxes</label>
+            <label class="form-check-label" for="switchCheckDefault">Include taxes</label>
             </div>
         </div>
     </div>
+    <% if(allListings.length === 0) { %>
+        <div class="text-center mt-5">
+            <h4>Oops! Found Nothing 😔</h4>
+            <a href="/listings" class="btn btn-outline-dark mt-2">Go Back</a>
+        </div>
+    <% } %>
     <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-2">
         <% for(let listing of allListings) { %>
             <a href="listings/<%= listing._id %>" class="listing-link">
